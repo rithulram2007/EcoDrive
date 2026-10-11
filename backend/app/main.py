@@ -3,7 +3,7 @@ from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from sqlalchemy import text
-
+from app.seed import seed_database
 from app.config import settings
 from app.database import engine, Base, get_db
 from app.routers import dashboard, trips, analytics, gamification, insights, comparison
@@ -47,6 +47,14 @@ def health_check(db: Session = Depends(get_db)):
         "environment": settings.ENVIRONMENT,
         "database": db_status,
         "timestamp": datetime.datetime.utcnow().isoformat()
+    }
+# TEMPORARY: Seed demo database
+@app.post("/api/seed-demo")
+def seed_demo_database():
+    seed_database()
+    return {
+        "status": "success",
+        "message": "Demo database seeded successfully"
     }
 
 
