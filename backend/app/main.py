@@ -5,36 +5,12 @@ from sqlalchemy.orm import Session
 from sqlalchemy import text
 
 from app.config import settings
-from app.database import engine, Base, get_db, SessionLocal
-from app.models import Trip
-from app.seed import seed_database
+from app.database import engine, Base, get_db
 from app.routers import dashboard, trips, analytics, gamification, insights, comparison
+
 
 # Initialize database tables
 Base.metadata.create_all(bind=engine)
-
-
-# Seed database only if there are no trips
-def initialize_demo_data():
-    db = SessionLocal()
-    try:
-        trip_count = db.query(Trip).count()
-
-        if trip_count == 0:
-            print("No trips found. Seeding demo database...")
-            seed_database()
-            print("Demo database seeded successfully.")
-        else:
-            print(f"Database already contains {trip_count} trips. Skipping seed.")
-
-    except Exception as e:
-        print(f"Database initialization/seed error: {e}")
-    finally:
-        db.close()
-
-
-# Run safe initialization
-initialize_demo_data()
 
 
 app = FastAPI(
@@ -42,6 +18,7 @@ app = FastAPI(
     version=settings.APP_VERSION,
     description="EcoDrive API — Gamified eco-driving and carbon footprint coaching platform."
 )
+
 
 # CORS Configuration
 app.add_middleware(
@@ -84,6 +61,7 @@ app.include_router(comparison.router)
 
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run(
         "app.main:app",
         host="0.0.0.0",
